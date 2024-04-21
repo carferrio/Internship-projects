@@ -1,0 +1,145 @@
+<!doctype html>
+
+<html lang="en">
+
+	<head>
+
+		<meta charset="utf-8">
+
+		<title>API project</title>
+		<meta name="description" content="API project">
+		<meta name="author" content="Carlos Fernandez Rios">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+    	<link href="favicon.ico" rel="icon">
+    	<link href="libs/css/style.css" rel="stylesheet">
+
+	</head>
+
+	<body>
+
+		<table>
+			<thead>
+				<tr>
+					<th scope="col">API</th>
+					<th scope="col">Description</th>
+					<th scope="col"></th>
+				</tr>
+
+			</thead>
+
+			<tbody>
+				<tr>
+					<td>Weather API</td>
+					<td>Introduce 4 coordinates to get Temperature and clouds in that area
+						<form>
+						North<input id="selNorth">
+						South<input id="selSouth">
+						East<input id="selEast">
+						West<input id="selWest">
+			
+					</form></td>
+					<td><button id="weatherSubmit">Submit</button></td>
+				</tr>
+				<tr>
+					<td>Earthquake API</td>
+					<td>Introduce 4 coordinates to get information about biggest earthquake in that area
+						<form>
+						North<input id="eNorth">
+						South<input id="eSouth">
+						East<input id="eEast">
+						West<input id="eWest">
+			
+					</form></td>
+					<td><button id="earthquakeSubmit">Submit</button></td>
+				</tr>
+
+				
+
+				<tr>
+					<td>Ocean API</td>
+					<td>Introduce latitude and longitud to find out the ocean
+						<form>
+						Latitude<input id="selLat">
+						Longitude<input id="selLng">
+						
+			
+					</form></td>
+					<td><button id="oceanSubmit">Submit</button></td>
+				</tr>
+
+			</tbody>
+
+			
+		</table>
+
+		
+		<br><br>
+
+		<div id="divResults">
+			
+			<table>
+
+			    <tr>
+				<td align="right">
+					Temperature (°C): 
+				</td>
+				<td id="txtTemperature">
+					
+				</td>
+			    </tr>
+
+                <tr>
+				<td align="right">
+					Clouds (°C): 
+				</td>
+				<td id="txtClouds">
+					
+				</td>
+			    </tr>
+				<tr>
+					<td align="right">
+						Magnitude: 
+					</td>
+					<td id="txtMagnitude">
+						
+					</td>
+					</tr>
+					<tr>
+						<td align="right">
+							Datetime: 
+						</td>
+						<td id="txtDatetime">
+							
+						</td>
+					</tr>
+
+					
+
+					<tr>
+						<td align="right">
+							Ocean name: 
+						</td>
+						<td id="txtName">
+							
+						</td>
+
+						
+					</tr>
+
+				
+				
+
+
+			</table>
+
+		</div>
+
+		<div id=”preloader”></div>
+
+		<script type="application/javascript" src="libs/js/jquery-2.2.3.min.js"></script>
+		<script type="application/javascript" src="libs/js/script.js"></script>
+
+	</body>
+
+</html>
