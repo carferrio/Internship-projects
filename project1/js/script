@@ -1,0 +1,514 @@
+// ---------------------------------------------------------
+// GLOBAL DECLARATIONS
+// ---------------------------------------------------------
+
+var map;
+var countryCode;
+var countryBorder;
+
+// tile layers
+
+var streets = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+  attribution: "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
+}
+);
+
+var satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+  attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+}
+);
+
+var basemaps = {
+  "Streets": streets,
+  "Satellite": satellite
+};
+
+var cityMap = L.markerClusterGroup();
+var airportsMap = L.markerClusterGroup();
+
+var overlayMaps = {
+  "Cities": cityMap,
+  "Airports": airportsMap,
+};
+var airportIcon = L.icon({
+  iconUrl: 'icons/airport.png',
+  iconSize: [50, 50],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32]
+});
+
+var cityIcon = L.icon({
+  iconUrl: 'icons/cities.png',
+  iconSize: [50, 50],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32]
+});
+
+
+// ---------------------------------------------------------
+// EVENT HANDLERS
+// ---------------------------------------------------------
+
+
+function populateList() {
+
+  $.ajax({
+    url: "php/getCountryList.php",
+    type: 'POST',
+    dataType: 'json',
+
+    success: function (result) {
+      console.log(JSON.stringify(result));
+      if (result.status.name == "ok") {
+        $.each(result.data, function (index) {
+          $('#countrySelect').append($("<option>", {
+            value: result.data[index].iso_a2,
+            text: result.data[index].name
+          }));
+        });
+      }
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+
+    }
+  });
+
+}
+
+async function getCountry() {
+  if (navigator.geolocation) {
+    try {
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
+
+
+      let latitude = position.coords.latitude;
+      let longitude = position.coords.longitude;
+
+
+      countryCode = await new Promise((resolve, reject) => {
+        $.ajax({
+          url: "php/getCountryCode.php",
+          type: 'POST',
+          dataType: 'json',
+          data: {
+            lat: latitude,
+            lng: longitude
+          },
+          success: function (result) {
+
+            console.log(JSON.stringify(result));
+
+            if (result.status.name == "ok") {
+
+              resolve(result.data.country);
+
+            }
+
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+
+          }
+        })
+
+      });
+
+      //Location
+      $('#countrySelect').val(countryCode);
+      countryName = $('#countrySelect').find(':selected').text();
+      
+      getBorders(countryCode);
+      getInfo(countryCode);
+      getNews(countryCode);
+      getWeather(latitude, longitude);
+      countryFlag(countryCode);
+      getCities(countryCode);
+      getCurrencyInfo(countryName);
+      //getAirports(countryCode);
+
+
+
+
+      //Change country
+      $('#countrySelect').change(function () {
+        countryCode = $('#countrySelect').val();
+        countryName = $('#countrySelect').find(':selected').text();
+        console.log(countryName);
+        getBorders(countryCode);
+        getInfo(countryCode);
+        getNews(countryCode);
+        countryFlag(countryCode);
+        getCoordinates(countryName);
+        getCities(countryCode);
+        getCurrencyInfo(countryName);
+        //getAirports(countryCode);
+
+
+      })
+
+
+      return { countryCode };
+
+
+    }
+    catch (error) {
+      return null;
+    }
+  }
+}
+
+
+//get borders
+
+function getBorders(countryCode) {
+  if (countryBorder) {
+    map.removeLayer(countryBorder);
+  }
+  $.ajax({
+    url: "php/getBorders.php",
+    type: 'GET',
+    dataType: 'json',
+    data: {
+      iso_a2: countryCode
+
+    },
+    success: function (result) {
+
+      console.log(JSON.stringify(result));
+
+      if (result.status.name == "ok") {
+
+        countryBorder = L.geoJSON(result.data, {
+          style: {
+            color: 'green',
+            weight: 1,
+          },
+
+        }).addTo(map);
+        map.fitBounds(countryBorder.getBounds());
+
+      }
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+
+    }
+  });
+
+}
+
+//Info
+function getInfo(countryCode) {
+
+
+  $.ajax({
+    url: "php/getCountryInfo.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+      country: countryCode
+
+    },
+    success: function (result) {
+
+      console.log(JSON.stringify(result));
+
+      if (result.status.name == "ok") {
+
+        $('#txtCountry').html(result['data'][0]['countryName']);
+        $('#txtContinent').html(result['data'][0]['continent']);
+        $('#txtCapital').html(result['data'][0]['capital']);
+        $('#txtLanguages').html(result['data'][0]['languages']);
+        $('#txtPopulation').html(numberWithCommas(Math.round(result['data'][0]['population'])));
+        $('#txtArea').html(numberWithCommas(Math.round(result['data'][0]['areaInSqKm'])));
+
+      }
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+
+    }
+  });
+}
+//get Flags
+function countryFlag(countryCode) {
+  var flag = document.getElementById("imgFlag");
+  flag.src = `https://flagsapi.com/${countryCode}/flat/64.png`;
+}
+
+//get Weather
+function getWeather(latitude, longitude) {
+  $.ajax({
+    url: "php/getWeather.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+      lat: latitude,
+      lon: longitude
+
+    },
+    success: function (result) {
+
+      console.log(JSON.stringify(result));
+
+      if (result.status.name == "ok") {
+
+        $('#txtCurrentWeather').html(`<strong>${result['data']['weather'][0]['description']}</strong>`);
+        $('#imgIcon').attr("src", `http://openweathermap.org/img/wn/${result['data']['weather'][0]['icon']}.png`);
+        $('#tMax').html(Math.round(result['data']['main']['temp_max'] - 273.15) + "°C");
+        $('#tMin').html(Math.round(result['data']['main']['temp_min'] - 273.15) + "°C");
+
+      }
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+
+    }
+  });
+}
+//get News
+function getNews(countryCode) {
+
+  $('#txtNews').empty();
+
+  $.ajax({
+    url: "php/getNews.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+      country: countryCode.toLowerCase()
+
+    },
+    success: function (result) {
+
+      console.log(JSON.stringify(result));
+
+      if (result.status.name == "ok") {
+        $.each(result.data, function (index) {
+          $('#txtNews').append("<div>", `<table class="table table-striped">
+          <tbody>
+           <tr>
+             <td><a href="${result.data[index].url}">${result.data[index].title}</a></td>
+             <td>${result.data[index].author}</td>
+
+           </tr>
+           </tbody>
+           </table>`);
+        })
+      }
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+
+    }
+  });
+}
+//get cities
+function getCities(countryCode) {
+
+  $.ajax({
+    url: "php/getCities.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+      country: countryCode
+
+    },
+    success: function (result) {
+
+      console.log(JSON.stringify(result));
+
+      if (result.status.name == "ok") {
+        cityMap.clearLayers();
+        for (let i = 0; i < result.data.length; i++) {
+          const cityName = result.data[i].name;
+          let cityLat = result.data[i].lat;
+          let cityLon = result.data[i].lng;
+
+          L.marker([cityLat, cityLon], { icon: cityIcon })
+            .bindTooltip("<div class='col text-center'><strong>" + cityName + "</strong><br><i></i></div>", { direction: 'top', sticky: true })
+            .addTo(cityMap);
+        }
+
+      }
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+
+    }
+
+  });
+}
+
+//get airports
+function getAirports(countryCode) {
+
+  $.ajax({
+    url: "php/getAirports.php",
+    type: 'GET',
+    dataType: 'json',
+    headers: { 'X-Api-Key': IHlv9N7sYdGXZieBDv1 / Iw == KDlCuTOMyXSS22pE },
+    data: {
+      country: countryCode
+
+    },
+    success: function (result) {
+
+      console.log(JSON.stringify(result));
+
+      if (result.status.name == "ok") {
+        airportsMap.clearLayers();
+
+        for (let i = 0; i < result.data.length; i++) {
+          const airportName = result.data[i].name;
+          let airportLat = result.data[i].latitude;
+          let airportLon = result.data[i].longitude;
+
+          L.marker([airportLat, airportLon], { icon: airportIcon })
+            .bindTooltip("<div class='col text-center'><strong>" + airportName + "</strong><br><i></i></div>", { direction: 'top', sticky: true })
+            .addTo(airportsMap);
+        }
+
+      }
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+
+    }
+
+  });
+}
+
+//get latitude and longitude
+function getCoordinates(countryName) {
+  $.ajax({
+    url: "php/getCoordinates.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+      q: encodeURIComponent(countryName)
+
+    },
+    success: function (result) {
+
+      console.log(JSON.stringify(result));
+
+      if (result.status.name == "ok") {
+
+        latitude = result.data.results[0].geometry.lat;
+        longitude = result.data.results[0].geometry.lng;
+        getWeather(latitude, longitude);
+
+      }
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+
+    }
+  });
+}
+//get currencyInfo
+function getCurrencyInfo(countryName) {
+
+
+  $.ajax({
+    url: "php/getCurrencyInfo.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+      q: encodeURIComponent(countryName)
+
+    },
+    success: function (result) {
+
+      console.log(JSON.stringify(result));
+
+      if (result.status.name == "ok") {
+
+        $('#txtCurrencyName').html(result.data.results[0].annotations.currency.name);
+        $('#txtCurrencyCode').html(result.data.results[0].annotations.currency.iso_code);
+        $('#txtSymbol').html(result.data.results[0].annotations.currency.symbol);
+        var currencyIso=result.data.results[0].annotations.currency.iso_code;
+        currencyConverter(currencyIso);
+        
+        
+
+      }
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+
+    }
+  });
+}
+//Currency converter
+function currencyConverter(currencyIso) {
+  var quantity = parseFloat($('#quantity').val());
+  $('#targetCurrency').html(currencyIso);
+  
+
+  $.ajax({
+    url: "php/currencyConverter.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+      
+      currencyIso: currencyIso
+
+    },
+    success: function (result) {
+
+      console.log(JSON.stringify(result));
+
+      if (result.status.name == "ok") {
+        var quantityResult=quantity*result.data;
+        $('#quantityResult').val(quantityResult);
+        
+      }
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+
+    }
+  });
+}
+
+//number with commas
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// initialise and add controls once DOM is ready
+$(document).ready(function () {
+  populateList();
+  getCountry();
+
+
+
+  map = L.map("map", {
+    layers: [streets]
+  })
+
+  layerControl = L.control.layers(basemaps, overlayMaps).addTo(map);
+
+  infoBtn.addTo(map);
+  weatherBtn.addTo(map);
+  currencyBtn.addTo(map);
+  newsBtn.addTo(map);
+})
+// buttons
+
+var infoBtn = L.easyButton("fas fa-info", function (btn, map) {
+  $("#countryInfo").modal("show");
+});
+var weatherBtn = L.easyButton("fa-solid fa-cloud", function (btn, map) {
+  $("#weather").modal("show");
+});
+var currencyBtn = L.easyButton("fa-solid fa-money-bill-trend-up", function (btn, map) {
+  $("#currency").modal("show");
+});
+var newsBtn = L.easyButton("fa-solid fa-newspaper", function (btn, map) {
+  $("#news").modal("show");
+});
