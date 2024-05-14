@@ -19,8 +19,8 @@
     <link rel="stylesheet" href="css\toastify.min.css">
     <link rel="stylesheet" href="css\style.css">
 </head>
-
 <body>
+    <div id=”preloader”></div>
     <span id="selectContainer">
         <select id="countrySelect" class="form-select shadow-sm">
             <option value=""></option>
@@ -139,24 +139,57 @@
                     </div>
                     <div class="modal-body">
                         <table class="table table-striped">
-                            <tr>
-    
-                                <td id="txtCurrentWeather" class="text-center"></td>
-    
-                                <td>
-                                    <img id="imgIcon" src="">
-                                </td>
-    
-                                <td class="text-end">
-                                    <p id="tMax"></p>
-                                    <p id="tMin"></p>
-    
-    
-                                </td>
-    
+                            <tr></tr>
+                            <td class="text-left"><strong>Today</strong></td>
+                            <td></td>
+                            <td class="text-end"><strong>Temperature Max/Min</strong></td>
                             </tr>
-    
+                            <tr></tr>
+                                <td id="txtCurrentWeather" class="text-left"></td>
+                                <td>
+                                    <img id="imgIcon" class="img-fluid mt-0" src="" alt="weather icon" title="">
+                                </td>
+                                <td class="text-end">
+                                    <strong><p id="tMax"></p></strong>
+                                    <strong><p id="tMin"></p></strong>
+                                </td>
+                            </tr>
                         </table>
+                        <div class="row">
+                            <div class="col border m-2">
+                              <div class="row">
+                                <div class="col text-center">
+                                  <strong><p  class="fw-bold fs-6 mt-3"> Tomorrow</p></strong>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col text-center">
+                                  <p class="fw-bold fs-4 mb-0"><span id="nextDayMaxTemp"></span><sup>o</sup>c</p>
+                                  <p class="fs-5 mt-0 text-secondary"><span id="nextDayMinTemp"></span><sup>o</sup>c</p>
+                                </div>
+                                <div class="col text-center">
+                                  <img id="nextDayIcon" src="" alt="weather icon" title="">
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col border m-2">
+                              <div class="row">
+                                <div class="col text-center">
+                                  <strong><p class="fw-bold fs-6 mt-3">Next 48 hours</p></strong>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col text-center">
+                                  <p class="fw-bold fs-4 mb-0"><span id="dayAfterMaxTemp"></span><sup>o</sup>c</p>
+                                  <p class="fs-5 mt-0 text-secondary"><span id="dayAfterMinTemp"></span><sup>o</sup>c</p>
+                                </div>
+                                <div class="col text-center">
+                                  <img id="dayAfterIcon" src="" alt="weather icon" title="">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        
                 </div>
                 <div class="modal-footer">
                     <p class="fs-6 fw-light">Powered by <a href="https://openweathermap.org/current" target="_blank"
@@ -250,6 +283,26 @@
                 <div class="modal-footer">
                     <p class="fs-6 fw-light">Powered by <a href="https://newsapi.org/" target="_blank"
                             title="Free news Info API">News API</a></p>
+                    <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Wikipedia-->
+    <div id="wikipedia" class="modal" data-bs-backdrop="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-success bg-gradient text-white">
+                    <h5 id="txtCountry" class="modal-title">Wikipedia articles</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                
+                <div id="txtWikipedia" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <p class="fs-6 fw-light">Powered by <a href="https://www.geonames.org/export/ws-overview.html" target="_blank"
+                            title="Wikipedia Info API">Geonames API</a></p>
                     <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
