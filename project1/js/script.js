@@ -12,6 +12,7 @@ $(window).on('load', function () {
 var map;
 var countryCode;
 var countryBorder;
+var currencyIso=null;
 
 // tile layers
 
@@ -454,7 +455,7 @@ function getEarthquakes(north, south, east, west) {
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.log('Location earthquakes error', textStatus, errorThrown);
-      alert("No earthqukes info available, sorry");
+      alert("No earthquakes info available, sorry");
 
     }
 
@@ -534,6 +535,7 @@ function getCoordinates(countryName) {
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.log('Coordinates error', textStatus, errorThrown);
+      
 
     }
   });
@@ -559,6 +561,10 @@ function getCurrencyInfo(countryName) {
         $('#txtCurrencyName').html(result.data.results[0].annotations.currency.name);
         $('#txtCurrencyCode').html(result.data.results[0].annotations.currency.iso_code);
         $('#txtSymbol').html(result.data.results[0].annotations.currency.symbol);
+        currencyIso=result.data.results[0].annotations.currency.iso_code;
+        
+        
+        
 
       } else {
         console.log("error fetching currency data");
@@ -616,8 +622,46 @@ function getWikipedia(latitude, longitude) {
     }
   });
 }
+/*//currencyConverter
+function currencyConverter(currencyIso) {
+  var quantity = parseFloat($('#quantity').val());
+
+
+ 
+  $.ajax({
+    url: "php/currencyConverter.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+
+      currencyIso: currencyIso
+
+    },
+    success: function (result) {
+
+      console.log(JSON.stringify(result));
+
+      if (result.status.name == "ok") {
+        $('#exchangeRate').append($("<option>", {
+          value: result.data.key,
+          text: result.data.value
+        }));
+
+        var quantityResult = quantity * result.data;
+        $('#quantityResult').val(quantityResult.toFixed(4));
+
+      }
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log('Currency converter error', textStatus, errorThrown);
+
+    }
+  });
+}*/
 //currency List
-function currencyList() {
+function currencyList(currencyIso) {
+  
   $.ajax({
     url: "php/getExchangeRate.php",
     type: 'POST',
@@ -627,12 +671,20 @@ function currencyList() {
       console.log(JSON.stringify(result));
 
       if (result.status.name == "ok") {
-        $.each(result.data, function (key, value) {
-          $('#exchangeRate').append($("<option>", {
-            value: value,
-            text: key
-          }));
-        });
+        
+          $('#exchangeRate').empty();
+          $.each(result.data, function (key, value) {
+            //$('#exchangeRate').append("<select>", `<option value="${value}">"${key}"</option>`);
+            if(key == currencyIso){
+              $('#exchangeRate').append($("<option>", {
+                value: value,
+                text: key
+              }));
+              calcResult();
+            }
+          });
+
+        
       } else {
         console.log("error retrieving exchange rates");
         alert('Error: ' + result.data.status.description);
@@ -649,6 +701,7 @@ function currencyList() {
 
 //Currency converter
 function calcResult() {
+  
 
   $('#quantityResult').val(numeral($('#quantity').val() * $('#exchangeRate').val()).format("0,0.00"));
 
@@ -672,10 +725,12 @@ $('#exchangeRate').on('change', function () {
 
 })
 $('#currency').on('show.bs.modal', function () {
-
+  currencyList(currencyIso);
   calcResult();
 
 })
+
+
 
 //number with commas
 function numberWithCommas(x) {
