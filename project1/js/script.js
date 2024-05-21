@@ -74,6 +74,11 @@ function populateList() {
     success: function (result) {
       console.log(JSON.stringify(result));
       if (result.status.name == "ok") {
+       // var country = result;
+        //country = Object.values(country).sort((a, b) =>
+        //  a.name.localeCompare(b.name)
+        //);
+
         $.each(result.data, function (index) {
           $('#countrySelect').append($("<option>", {
             value: result.data[index].iso_a2,
@@ -706,7 +711,7 @@ function numberWithCommas(x) {
 $(document).ready(function () {
   populateList();
   getCountry();
-  currencyList();
+  
 
   map = L.map("map", {
     layers: [streets]
