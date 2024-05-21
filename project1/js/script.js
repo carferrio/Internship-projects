@@ -562,6 +562,7 @@ function getCurrencyInfo(countryName) {
         $('#txtCurrencyCode').html(result.data.results[0].annotations.currency.iso_code);
         $('#txtSymbol').html(result.data.results[0].annotations.currency.symbol);
         currencyIso=result.data.results[0].annotations.currency.iso_code;
+        currencyList(currencyIso);
         
         
         
@@ -680,7 +681,7 @@ function currencyList(currencyIso) {
                 value: value,
                 text: key
               }));
-              calcResult();
+              
             }
           });
 
