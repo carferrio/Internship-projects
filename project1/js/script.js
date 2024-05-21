@@ -623,43 +623,7 @@ function getWikipedia(latitude, longitude) {
     }
   });
 }
-/*//currencyConverter
-function currencyConverter(currencyIso) {
-  var quantity = parseFloat($('#quantity').val());
 
-
- 
-  $.ajax({
-    url: "php/currencyConverter.php",
-    type: 'POST',
-    dataType: 'json',
-    data: {
-
-      currencyIso: currencyIso
-
-    },
-    success: function (result) {
-
-      console.log(JSON.stringify(result));
-
-      if (result.status.name == "ok") {
-        $('#exchangeRate').append($("<option>", {
-          value: result.data.key,
-          text: result.data.value
-        }));
-
-        var quantityResult = quantity * result.data;
-        $('#quantityResult').val(quantityResult.toFixed(4));
-
-      }
-
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      console.log('Currency converter error', textStatus, errorThrown);
-
-    }
-  });
-}*/
 //currency List
 function currencyList(currencyIso) {
   
@@ -675,7 +639,7 @@ function currencyList(currencyIso) {
         
           $('#exchangeRate').empty();
           $.each(result.data, function (key, value) {
-            //$('#exchangeRate').append("<select>", `<option value="${value}">"${key}"</option>`);
+            
             if(key == currencyIso){
               $('#exchangeRate').append($("<option>", {
                 value: value,
@@ -726,7 +690,7 @@ $('#exchangeRate').on('change', function () {
 
 })
 $('#currency').on('show.bs.modal', function () {
-  currencyList(currencyIso);
+  
   calcResult();
 
 })
