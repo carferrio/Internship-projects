@@ -1,7 +1,7 @@
 <?php
 
 	// example use from browser
-	// http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&locationID=<id>
+	// http://localhost/companydirectory/libs/php/searchAll.php?txt=<txt>
 
 	// remove next two lines for production
 	
@@ -9,9 +9,7 @@
 	error_reporting(E_ALL);
 
 	$executionStartTime = microtime(true);
-	
-	// this includes the login details
-	
+
 	include("config.php");
 
 	header('Content-Type: application/json; charset=UTF-8');
@@ -34,12 +32,14 @@
 
 	}	
 
-	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
+	// first query - SQL statement accepts parameters and so is prepared to avoid SQL injection.
 	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
-	$query = $conn->prepare('UPDATE personnel SET firstName=?, lastName=?, jobTitle=?, email=?, departmentID=? WHERE id=?');
+	$query = $conn->prepare('SELECT `d`.`id`, `d`.`name`, `d`.`locationID`, `l`.`name` as location FROM `department` `d` LEFT JOIN location `l` ON (`d`.`locationID` = `l`.`id`) WHERE `d`.`id` LIKE ? OR `d`.`name` LIKE ? OR `d`.`locationID` LIKE ? OR `l`.`name` LIKE ? ORDER BY `d`.`name`');
 
-	$query->bind_param("sssssi", $_POST['firstName'], $_POST['lastName'], $_POST['jobTitle'], $_POST['email'], $_POST['departmentID'], $_POST['id']);
+  $likeText = "%" . $_POST['txt'] . "%";
+
+  $query->bind_param("ssss", $likeText, $likeText, $likeText, $likeText);
 
 	$query->execute();
 	
@@ -57,12 +57,22 @@
 		exit;
 
 	}
+    
+	$result = $query->get_result();
+
+  $found = [];
+
+	while ($row = mysqli_fetch_assoc($result)) {
+
+		array_push($found, $row);
+
+	}
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = [];
+	$output['data']['found'] = $found;
 	
 	mysqli_close($conn);
 
