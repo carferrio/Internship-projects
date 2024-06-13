@@ -1,17 +1,11 @@
 <?php
 
-	// example use from browser
-	// http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&locationID=<id>
 
-	// remove next two lines for production
-	
 	ini_set('display_errors', 'On');
 	error_reporting(E_ALL);
 
 	$executionStartTime = microtime(true);
-	
-	// this includes the login details
-	
+
 	include("config.php");
 
 	header('Content-Type: application/json; charset=UTF-8');
@@ -19,7 +13,7 @@
 	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
 	if (mysqli_connect_errno()) {
-		
+
 		$output['status']['code'] = "300";
 		$output['status']['name'] = "failure";
 		$output['status']['description'] = "database unavailable";
@@ -32,40 +26,51 @@
 
 		exit;
 
-	}	
+	}
 
-	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
-	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
+	// first query - SQL statement accepts parameters and so is prepared to avoid SQL injection.
+	// $_POST used for development / debugging. Remember to change to $_POST for production
 
-	$query = $conn->prepare('UPDATE personnel SET firstName=?, lastName=?, jobTitle=?, email=?, departmentID=? WHERE id=?');
+	$query = $conn->prepare('SELECT l.name AS locationName, COUNT(d.id) as departmentCount FROM location l LEFT JOIN department d ON (d.locationID = l.id) WHERE l.id  = ?');
 
-	$query->bind_param("sssssi", $_POST['firstName'], $_POST['lastName'], $_POST['jobTitle'], $_POST['email'], $_POST['departmentID'], $_POST['id']);
+	$query->bind_param("i", $_POST['id']);
 
 	$query->execute();
-	
+
 	if (false === $query) {
 
 		$output['status']['code'] = "400";
 		$output['status']['name'] = "executed";
-		$output['status']['description'] = "query failed";	
+		$output['status']['description'] = "query failed";
 		$output['data'] = [];
 
 		mysqli_close($conn);
 
-		echo json_encode($output); 
+		echo json_encode($output);
 
 		exit;
 
 	}
 
+	$result = $query->get_result();
+
+   	$location = [];
+
+	while ($row = mysqli_fetch_assoc($result)) {
+
+		array_push($location, $row);
+
+	}
+
+
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = [];
-	
+	$output['data']['location'] = $location;
+
 	mysqli_close($conn);
 
-	echo json_encode($output); 
+	echo json_encode($output);
 
 ?>
