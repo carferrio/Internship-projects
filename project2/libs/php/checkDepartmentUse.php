@@ -33,7 +33,7 @@
 
 	$query = $conn->prepare('SELECT d.name AS departmentName, COUNT(p.id) as personnelCount FROM department d LEFT JOIN personnel p ON (p.departmentID = d.id) WHERE d.id  = ?');
 
-	$query->bind_param("i", $_POST['id']);
+	$query->bind_param("i", $_REQUEST['id']);
 
 	$query->execute();
 

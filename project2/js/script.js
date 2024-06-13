@@ -14,13 +14,12 @@ $("#searchInp").on("keyup", function () {
   $("#personnelTableBody").empty();
   $("#departmentTableBody").empty();
   $("#locationTableBody").empty();
-  var txt = $("#searchInp").val();
   var tableBody = $("#personnelTableBody");
   var departmentTableBody = $("#departmentTableBody");
   var locationTableBody = $("#locationTableBody");
   if ($("#personnelBtn").hasClass("active")) {
     $.ajax({
-      url: "libs/php/SearchAll.php",
+      url: "libs/php/searchAll.php",
       type: "POST",
       dataType: "json",
       data: { txt },
@@ -73,7 +72,7 @@ $("#searchInp").on("keyup", function () {
       }})
   } else if ($("#departmentsBtn").hasClass("active")) {
     $.ajax({
-      url: "libs/php/SearchDepartments.php",
+      url: "libs/php/searchDepartments.php",
       type: "POST",
       dataType: "json",
       data: { txt },
@@ -123,7 +122,7 @@ $("#searchInp").on("keyup", function () {
   } else if ($("#locationsBtn").hasClass("active")) {
 
     $.ajax({
-      url: "libs/php/SearchLocations.php",
+      url: "libs/php/searchLocations.php",
       type: "POST",
       dataType: "json",
       data: { txt },
@@ -376,7 +375,7 @@ $("#selectPersonnelLocation").change(function () {
 
 
     $.ajax({
-      url: "libs/php/SearchAll.php",
+      url: "libs/php/searchAll.php",
       type: "POST",
       dataType: "json",
       data: { txt },

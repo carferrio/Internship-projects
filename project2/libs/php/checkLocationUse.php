@@ -33,7 +33,7 @@
 
 	$query = $conn->prepare('SELECT l.name AS locationName, COUNT(d.id) as departmentCount FROM location l LEFT JOIN department d ON (d.locationID = l.id) WHERE l.id  = ?');
 
-	$query->bind_param("i", $_POST['id']);
+	$query->bind_param("i", $_REQUEST['id']);
 
 	$query->execute();
 

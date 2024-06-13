@@ -37,7 +37,7 @@
 
 	$query = $conn->prepare('SELECT `id`, `name` FROM `location` WHERE `id` LIKE ? OR `name` LIKE ? ORDER BY `name`');
 
-  $likeText = "%" . $_POST['txt'] . "%";
+  $likeText = "%" . $_REQUEST['txt'] . "%";
 
   $query->bind_param("ss", $likeText, $likeText);
 
