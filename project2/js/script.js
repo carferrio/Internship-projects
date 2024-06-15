@@ -160,7 +160,7 @@ $("#searchInp").on("keyup", function () {
             deleteButton.classList = "btn btn-primary btn-sm me-2";
             deleteButton.setAttribute("type", "button");
             deleteButton.setAttribute("data-bs-toggle", "modal");
-            deleteButton.setAttribute("data-bs-target", "#deletedepartmentModal");
+            deleteButton.setAttribute("data-bs-target", "#deleteDepartmentModal");
             deleteButton.setAttribute("data-id", id);
             deleteButton.innerHTML = '<i class="fa-solid fa-trash fa-fw"></i>';
 
@@ -660,7 +660,7 @@ $("#selectDepartmentLocation").change(function () {
             deleteButton.classList = "btn btn-primary btn-sm me-2";
             deleteButton.setAttribute("type", "button");
             deleteButton.setAttribute("data-bs-toggle", "modal");
-            deleteButton.setAttribute("data-bs-target", "#deletedepartmentModal");
+            deleteButton.setAttribute("data-bs-target", "#deleteDepartmentModal");
             deleteButton.setAttribute("data-id", id);
             deleteButton.innerHTML = '<i class="fa-solid fa-trash fa-fw"></i>';
 
@@ -954,7 +954,7 @@ function populateDepartments() {
           deleteButton.classList = "btn btn-primary btn-sm me-2";
           deleteButton.setAttribute("type", "button");
           deleteButton.setAttribute("data-bs-toggle", "modal");
-          deleteButton.setAttribute("data-bs-target", "#deletedepartmentModal");
+          deleteButton.setAttribute("data-bs-target", "#deleteDepartmentModal");
           deleteButton.setAttribute("data-id", id);
           deleteButton.innerHTML = '<i class="fa-solid fa-trash fa-fw"></i>';
 
@@ -965,37 +965,7 @@ function populateDepartments() {
         });
 
         tableBody.append(frag);
-        /*result.data.forEach(function (result) {
-          var name = result.name;
-          var id = result.id;
-          var location = result.location;
-          var locationID = result.locationID;
-
-          var row = $("<tr>");
-          row.append($("<td>").text(name).addClass("align-middle text-nowrap"));
-          row.append($("<td>").text(location).addClass("align-middle text-nowrap d-none d-md-table-cell"));
-          row.attr("data-location-id", locationID);
-
-          var buttonsCell = $("<td>").addClass("text-end text-nowrap");
-          var editButton = $("<button>").addClass("btn btn-primary btn-sm me-2")
-            .attr("type", "button")
-            .attr("data-bs-toggle", "modal")
-            .attr("data-bs-target", "#editDepartmentModal")
-            .attr("data-id", id)
-            .html('<i class="fa-solid fa-pencil fa-fw"></i>');
-
-          var deleteButton = $("<button>").addClass("btn btn-primary btn-sm me-2 ")
-            .attr("type", "button")
-            .attr("data-bs-toggle", "modal")
-            .attr("data-bs-target", "#deleteDepartmentModal")
-            .attr("data-id", id)
-            .html('<i class="fa-solid fa-trash fa-fw"></i>');
-
-          buttonsCell.append(editButton, deleteButton);
-          row.append(buttonsCell);
-
-          tableBody.append(row);
-        });*/
+        
 
       } else {
         console.log('error');
