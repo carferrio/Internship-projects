@@ -337,7 +337,7 @@ function getNews(countryCode) {
       if (result.status.name == "ok") {
 
         if (result.data == 0) {
-          $('#txtNews').append("<p>", '<strong>Now news for this country, sorry!</strong>')
+          $('#txtNews').append("<p>", '<strong>Now news for this country, currently NewsAPI only working for US!</strong>')
 
         } else {
 
